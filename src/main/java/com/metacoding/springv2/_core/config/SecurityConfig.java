@@ -4,13 +4,33 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-//@Configuration
+import com.metacoding.springv2._core.filter.JwtAuthorizationFilter;
+
+@Configuration
 public class SecurityConfig {
 
     // 시큐리티 필터 등록
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+
+        // 인증/권한 주소 커스터마이징징
+        http.authorizeHttpRequests(authorize -> authorize
+                .requestMatchers("/api/**") // api만 적혀 있으면 모두 인증이 필요함.
+                .authenticated()
+                .anyRequest()
+                .permitAll());
+
+        // 폼 로그인 비활성화(Post : x-www-form-urlencoded : username, password)
+        http.formLogin(f -> f.disable());
+
+        // 베이직 인증 활성화 시킴 (requst 할때마다 username, password를 요구)
+        http.httpBasic(b -> b.disable());
+
+        // 인증 필터를 변경함
+        http.addFilterBefore(new JwtAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 }
