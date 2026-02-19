@@ -15,7 +15,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-        // 인증/권한 주소 커스터마이징징
+        // 인증/권한 주소 커스터마이징
         http.authorizeHttpRequests(authorize -> authorize
                 .requestMatchers("/api/**") // api만 적혀 있으면 모두 인증이 필요함.
                 .authenticated()
@@ -28,7 +28,7 @@ public class SecurityConfig {
         // 베이직 인증 활성화 시킴 (requst 할때마다 username, password를 요구)
         http.httpBasic(b -> b.disable());
 
-        // 인증 필터를 변경함
+        // 인증 필터를 변경
         http.addFilterBefore(new JwtAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
