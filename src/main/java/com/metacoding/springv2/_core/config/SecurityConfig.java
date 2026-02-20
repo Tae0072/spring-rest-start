@@ -9,6 +9,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.metacoding.springv2._core.filter.JwtAuthorizationFilter;
+import com.metacoding.springv2._core.util.RespFilter;
 
 @Configuration
 public class SecurityConfig {
@@ -22,22 +23,34 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
+        http.headers(headers -> headers
+                .frameOptions(frameOptions -> frameOptions.sameOrigin()));
+
+        http.cors(c -> c.disable());
+
+        http.exceptionHandling(ex -> ex
+                .authenticationEntryPoint(
+                        (request, response, authException) -> RespFilter.fail(response, 401, "로그인 후 이용해주세요"))
+                .accessDeniedHandler(
+                        (request, response, accessDeniedException) -> RespFilter.fail(response, 403, "권한이 없습니다")));
+
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         // 인증/권한 주소 커스터마이징
         http.authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/api/**") // api만 적혀 있으면 모두 인증이 필요함.
+                .requestMatchers("/api/**")// api만 적혀 있으면 모두 인증이 필요함.
                 .authenticated()
-                .anyRequest()
-                .permitAll());
+                .requestMatchers("/admin/**")
+                .hasRole("ADMIN")
+                .anyRequest().permitAll());
 
-        // 폼 로그인 비활성화(Post : x-www-form-urlencoded : username, password)
+        // 폼 로그인 비활성화 ( POST : x-www-form-urlencoded : username, password )
         http.formLogin(f -> f.disable());
 
-        // 베이직 인증 활성화 시킴 (requst 할때마다 username, password를 요구)
+        // 베이직 인증 활성화 시킴 (request 할때마다 username, password를 요구)
         http.httpBasic(b -> b.disable());
 
-        // input에 csrf 토큰 받는것을 비활성화 하기
+        // csrf 비활성화
         http.csrf(c -> c.disable());
 
         // 인증 필터를 변경
