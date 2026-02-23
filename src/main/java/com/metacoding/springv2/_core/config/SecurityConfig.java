@@ -7,7 +7,11 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.http.HttpMethod;
 
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import com.metacoding.springv2._core.filter.JwtAuthorizationFilter;
 import com.metacoding.springv2._core.util.RespFilter;
 
@@ -26,7 +30,8 @@ public class SecurityConfig {
         http.headers(headers -> headers
                 .frameOptions(frameOptions -> frameOptions.sameOrigin()));
 
-        http.cors(c -> c.disable());
+        // CORS 설정
+        http.cors(cors -> cors.configurationSource(configurationSource()));
 
         http.exceptionHandling(ex -> ex
                 .authenticationEntryPoint(
@@ -38,6 +43,7 @@ public class SecurityConfig {
 
         // 인증/권한 주소 커스터마이징
         http.authorizeHttpRequests(authorize -> authorize
+                .requestMatchers(HttpMethod.GET, "/api/boards/**").permitAll()
                 .requestMatchers("/api/**")// api만 적혀 있으면 모두 인증이 필요함.
                 .authenticated()
                 .requestMatchers("/admin/**")
@@ -57,5 +63,16 @@ public class SecurityConfig {
         http.addFilterBefore(new JwtAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+    }
+
+    public CorsConfigurationSource configurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.addAllowedHeader("*");
+        configuration.addAllowedMethod("*"); // GET, POST, PUT, DELETE (Javascript 요청 허용)
+        configuration.addAllowedOriginPattern("*"); // 모든 IP 주소 허용 (프론트 앤드 IP만 허용 react)
+        configuration.setAllowCredentials(true); // 클라이언트에서 쿠키 요청 허용
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 }

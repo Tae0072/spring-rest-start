@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.metacoding.springv2._core.handler.ex.Exception401;
+import com.metacoding.springv2._core.handler.ex.Exception400;
 import com.metacoding.springv2._core.util.JwtUtil;
 import com.metacoding.springv2.auth.AuthRequest.JoinDTO;
 import com.metacoding.springv2.auth.AuthRequest.LoginDTO;
@@ -31,6 +32,18 @@ public class AuthService {
             throw new Exception401("비밀번호가 틀렸어요");
 
         return JwtUtil.create(findUser);
+    }
+
+    /**
+     * 사용자 이름 중복 체크 비즈니스 로직
+     * 
+     * @param username 중복 확인할 사용자 이름
+     * @throws Exception400 동일한 사용자 이름이 이미 존재할 경우 발생
+     */
+    public void 유저네임중복체크(String username) {
+        userRepository.findByUsername(username).ifPresent(user -> {
+            throw new Exception400("이미 존재하는 유저네임입니다");
+        });
     }
 
     @Transactional

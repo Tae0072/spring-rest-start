@@ -1,5 +1,7 @@
 package com.metacoding.springv2.reply;
 
-public interface ReplyRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
 
+public interface ReplyRepository extends JpaRepository<Reply, Integer> {
+    
 }
