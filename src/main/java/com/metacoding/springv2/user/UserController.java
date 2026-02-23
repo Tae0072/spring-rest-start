@@ -31,7 +31,7 @@ public class UserController {
     // 인증된 사용자 또는 관리자가 특정 사용자를 조회할 때 사용하는 엔드포인트
     @GetMapping("/api/users/{id}")
     public ResponseEntity<?> userInfo(@PathVariable Integer id) {
-        UserResponse.UserDTO respDTO = userService.회원정보보기(id);
+        var respDTO = userService.회원정보보기(id);
         return Resp.ok(respDTO);
     }
 }

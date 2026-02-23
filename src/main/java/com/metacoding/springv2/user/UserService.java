@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
  * </p>
  */
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 @Service
 public class UserService {
     // 생성자 주입(불변 필드)으로 UserRepository를 사용한다.
@@ -27,8 +28,6 @@ public class UserService {
      * @return 조회된 사용자 정보 DTO
      * @throws Exception404 해당 ID의 사용자가 없을 경우 발생
      */
-    // 읽기 전용 트랜잭션으로 성능 최적화 및 불필요한 쓰기 잠금 방지
-    @Transactional(readOnly = true)
     public UserResponse.UserDTO 회원정보보기(Integer id) {
         User userPS = userRepository.findById(id)
                 .orElseThrow(() -> new Exception404("해당 유저를 찾을 수 없습니다"));

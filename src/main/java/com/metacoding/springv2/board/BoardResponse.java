@@ -28,9 +28,10 @@ public class BoardResponse {
             this.userId = board.getUser().getId();
             this.username = board.getUser().getUsername();
             this.createdAt = board.getCreatedAt();
+            // 댓글 엔티티 리스트를 DTO 리스트로 변환하여 할당
             this.replies = board.getReplies().stream()
                     .map(ReplyDTO::new)
-                    .collect(Collectors.toList());
+                    .toList(); // Java 16+ 스타일로 간소화
         }
     }
 
@@ -38,12 +39,14 @@ public class BoardResponse {
     public static class ListDTO {
         private Integer id;
         private String title;
+        private String content; // 게시글 내용 추가
         private String username;
         private Timestamp createdAt;
 
         public ListDTO(Board board) {
             this.id = board.getId();
             this.title = board.getTitle();
+            this.content = board.getContent(); // 게시글 내용 매핑
             this.username = board.getUser().getUsername();
             this.createdAt = board.getCreatedAt();
         }

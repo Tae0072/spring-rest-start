@@ -32,8 +32,8 @@ public class BoardController {
      */
     @PostMapping("/api/boards")
     public ResponseEntity<?> save(@Valid @RequestBody BoardRequest.SaveDTO reqDTO) {
-        Integer userId = currentUserId();
-        BoardResponse.DetailDTO respDTO = boardService.게시글작성(reqDTO, userId);
+        var userId = currentUserId();
+        var respDTO = boardService.게시글작성(reqDTO, userId);
         return Resp.ok(respDTO);
     }
 
@@ -45,7 +45,7 @@ public class BoardController {
      */
     @GetMapping("/api/boards")
     public ResponseEntity<?> findAll(@RequestParam(defaultValue = "0") int page) {
-        Page<BoardResponse.ListDTO> respDTO = boardService.게시글목록보기(page);
+        var respDTO = boardService.게시글목록보기(page);
         return Resp.ok(respDTO);
     }
 
@@ -57,7 +57,7 @@ public class BoardController {
      */
     @GetMapping("/api/boards/{id}")
     public ResponseEntity<?> findById(@PathVariable Integer id) {
-        BoardResponse.DetailDTO respDTO = boardService.게시글상세보기(id);
+        var respDTO = boardService.게시글상세보기(id);
         return Resp.ok(respDTO);
     }
 
@@ -71,8 +71,8 @@ public class BoardController {
     @PutMapping("/api/boards/{id}")
     public ResponseEntity<?> update(@PathVariable Integer id,
             @Valid @RequestBody BoardRequest.UpdateDTO reqDTO) {
-        Integer userId = currentUserId();
-        BoardResponse.DetailDTO respDTO = boardService.게시글수정하기(id, reqDTO, userId);
+        var userId = currentUserId();
+        var respDTO = boardService.게시글수정하기(id, reqDTO, userId);
         return Resp.ok(respDTO);
     }
 
@@ -84,7 +84,7 @@ public class BoardController {
      */
     @DeleteMapping("/api/boards/{id}")
     public ResponseEntity<?> delete(@PathVariable Integer id) {
-        Integer userId = currentUserId();
+        var userId = currentUserId();
         boardService.게시글삭제하기(id, userId);
         return Resp.ok("게시글 삭제가 완료되었습니다");
     }
@@ -95,8 +95,8 @@ public class BoardController {
      * @return 현재 로그인한 사용자 ID
      */
     private Integer currentUserId() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = (User) authentication.getPrincipal();
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        var user = (User) authentication.getPrincipal();
         return user.getId();
     }
 }

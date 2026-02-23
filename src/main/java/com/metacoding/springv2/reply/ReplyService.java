@@ -13,6 +13,7 @@ import com.metacoding.springv2.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
+@Transactional(readOnly = true) // 읽기 전용 트랜잭션 전역 적용
 @Service
 public class ReplyService {
     private final ReplyRepository replyRepository;
@@ -27,7 +28,7 @@ public class ReplyService {
      * @param userId  작성자 ID
      * @return 작성된 댓글 정보 DTO
      */
-    @Transactional
+    @Transactional // 쓰기 작업이므로 트랜잭션 설정
     public ReplyResponse.DTO 댓글작성(Integer boardId, ReplyRequest.SaveDTO reqDTO, Integer userId) {
         Board boardPS = boardRepository.findById(boardId)
                 .orElseThrow(() -> new Exception404("해당 게시글을 찾을 수 없습니다"));
@@ -53,9 +54,10 @@ public class ReplyService {
      * @param userId 수정 요청한 사용자 ID
      * @return 수정된 댓글 정보 DTO
      */
-    @Transactional
+    @Transactional // 쓰기 작업이므로 트랜잭션 설정
     public ReplyResponse.DTO 댓글수정하기(Integer id, ReplyRequest.UpdateDTO reqDTO, Integer userId) {
-        Reply replyPS = replyRepository.findById(id)
+        // Fetch Join을 사용하여 지연 로딩 없이 한 번의 쿼리로 정보 조회
+        var replyPS = replyRepository.findByIdWithUserAndBoard(id)
                 .orElseThrow(() -> new Exception404("해당 댓글을 찾을 수 없습니다"));
 
         // 권한 체크: 작성자만 수정 가능
@@ -73,9 +75,9 @@ public class ReplyService {
      * @param id     댓글 ID
      * @param userId 삭제 요청한 사용자 ID
      */
-    @Transactional
+    @Transactional // 쓰기 작업이므로 트랜잭션 설정
     public void 댓글삭제하기(Integer id, Integer userId) {
-        Reply replyPS = replyRepository.findById(id)
+        var replyPS = replyRepository.findById(id) // 삭제는 id만 필요하므로 단순 findById 유지
                 .orElseThrow(() -> new Exception404("해당 댓글을 찾을 수 없습니다"));
 
         // 권한 체크: 작성자만 삭제 가능
