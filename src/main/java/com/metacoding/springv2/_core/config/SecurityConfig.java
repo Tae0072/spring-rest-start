@@ -11,6 +11,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import com.metacoding.springv2._core.filter.JwtAuthorizationFilter;
 import com.metacoding.springv2._core.util.RespFilter;
 
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
 @Configuration
 public class SecurityConfig {
 
@@ -26,7 +30,8 @@ public class SecurityConfig {
         http.headers(headers -> headers
                 .frameOptions(frameOptions -> frameOptions.sameOrigin()));
 
-        http.cors(c -> c.disable());
+        // CORS 필터 적용 (rule.md 규정 준수)
+        http.cors(cors -> cors.configurationSource(configurationSource()));
 
         http.exceptionHandling(ex -> ex
                 .authenticationEntryPoint(
@@ -57,5 +62,20 @@ public class SecurityConfig {
         http.addFilterBefore(new JwtAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+    }
+
+    /**
+     * CORS 설정 소스 정의
+     * 모든 요청 경로에 대해 기본적인 헤더, 메서드, 출처를 허용함.
+     */
+    public CorsConfigurationSource configurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.addAllowedHeader("*");
+        configuration.addAllowedMethod("*"); // GET, POST, PUT, DELETE 등 모든 메서드 허용
+        configuration.addAllowedOriginPattern("*"); // 모든 출처 허용
+        configuration.setAllowCredentials(true); // 쿠키 요청 허용
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 }
